@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Activity,
   ArrowDown,
@@ -8,6 +8,7 @@ import {
   CircuitBoard,
   Code2,
   Cpu,
+  Download,
   GraduationCap,
   Layers3,
   Mail,
@@ -16,10 +17,14 @@ import {
   MessageCircle,
   Radio,
   Sparkles,
+  Sun,
   Terminal,
+  Moon,
   X,
 } from 'lucide-react'
 import profileImage from '../Profile/Noman.jpg'
+import cvFile from '../Profile/Muhammad_Noman_CV.pdf'
+import namalLogo from '../Profile/Namal Logo.png'
 
 const navItems = [
   { label: 'About', href: '#about' },
@@ -155,17 +160,27 @@ function SignalTag({ children }) {
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('portfolio-theme')
+    if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  })
 
   const closeMenu = () => setMenuOpen(false)
+  const toggleTheme = () => setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark')
+
+  useEffect(() => {
+    localStorage.setItem('portfolio-theme', theme)
+  }, [theme])
 
   return (
-    <div className="site-shell">
+    <div className="site-shell" data-theme={theme}>
       <div className="ambient ambient-one" />
       <div className="ambient ambient-two" />
 
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Muhammad Noman home">
-          <span className="brand-mark">MN<span>/</span></span>
+          <span className="header-profile"><img src={profileImage} alt="Muhammad Noman" /></span>
           <span className="brand-copy"><strong>Muhammad Noman</strong><small>electrical engineer</small></span>
         </a>
         <nav className={`main-nav ${menuOpen ? 'is-open' : ''}`} aria-label="Primary navigation">
@@ -176,6 +191,9 @@ function App() {
             Contact <ArrowUpRight size={15} />
           </a>
         </nav>
+        <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+        </button>
         <button className="menu-toggle" type="button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -191,7 +209,8 @@ function App() {
               <p className="hero-intro">I am Muhammad Noman, an Electrical Engineering student interested in embedded systems, MATLAB, robotics, and digital design.</p>
               <div className="hero-actions">
                 <a className="button button-primary" href="#work">View projects <ArrowUpRight size={17} /></a>
-                <a className="button button-quiet" href="mailto:muhammadnoman16ee@gmail.com">Contact me <Mail size={16} /></a>
+                <a className="button button-quiet" href="#contact">Contact me <Mail size={16} /></a>
+                <a className="button button-quiet" href={cvFile} download="Muhammad-Noman-CV.pdf">Download CV <Download size={16} /></a>
               </div>
               <div className="hero-meta">
                 <span><MapPin size={15} /> Kot Addu, Punjab</span>
@@ -210,12 +229,12 @@ function App() {
 
         <section className="section-pad about-section" id="about">
           <div className="section-grid">
-            <SectionHeading eyebrow="01 / about me" title="Learning by building real projects." copy="I work on embedded systems, MATLAB projects, robotics, and digital electronics." />
+            <SectionHeading eyebrow="01 / about me" title="I build practical electrical projects." copy="My work includes embedded systems, MATLAB, robotics, and digital design." />
             <div className="about-content">
-              <div className="about-lede">Interested in simple, practical engineering solutions.</div>
+              <div className="about-lede">Simple ideas. Useful engineering.</div>
               <div className="about-columns">
-                <p>I have worked with STM32, MATLAB, Simulink, Verilog, sensors, and digital logic. I enjoy learning through hands-on projects.</p>
-                <p>My final year project is an IMU system that uses multiple sensors to provide more reliable motion and orientation data.</p>
+                <p>I use STM32, MATLAB, Simulink, Verilog, sensors, and digital logic to learn by building.</p>
+                <p>My final year project uses multiple IMU sensors to improve motion and orientation data.</p>
               </div>
               <div className="interests-strip">
                 <span className="small-label">Outside the circuit</span>
@@ -227,10 +246,10 @@ function App() {
 
         <section className="section-pad education-section" id="education">
           <div className="section-grid education-grid">
-            <SectionHeading eyebrow="02 / education" title="Electrical Engineering education." copy="BS Electrical Engineering at Namal University." />
+            <SectionHeading eyebrow="02 / education" title="Electrical Engineering." copy="BS Electrical Engineering at Namal University." />
             <div className="education-card">
               <div className="card-topline"><span>October 2022 — Present</span><span>BS Electrical Engineering</span></div>
-              <div className="education-main"><div><h3>Namal University</h3><p>Mianwali, Pakistan</p></div><div className="degree-mark"><GraduationCap size={23} /><span>BS / EE</span></div></div>
+              <div className="education-main"><div className="university-identity"><img src={namalLogo} alt="Namal University logo" /><div><h3>Namal University</h3><p>Mianwali, Pakistan</p></div></div><div className="degree-mark"><GraduationCap size={23} /><span>BS / EE</span></div></div>
               <div className="fyp-box"><div className="fyp-label"><span className="signal-dot" /> Final year project</div><h4>Multiple-Sensor Inertial Measurement System</h4><p>Building a virtual IMU system with eight sensors to improve motion and orientation data when sensors have noise or errors.</p></div>
               <div className="coursework"><span className="small-label">Selected coursework</span><div className="coursework-list">{coursework.map((course) => <span key={course}>{course}</span>)}</div></div>
             </div>
@@ -238,24 +257,24 @@ function App() {
         </section>
 
         <section className="section-pad skills-section" id="skills">
-          <SectionHeading eyebrow="03 / skills" title="Technical skills and tools." copy="Tools used for embedded systems, simulation, design, and networking." />
+          <SectionHeading eyebrow="03 / skills" title="Skills and tools." copy="Tools I use for design, simulation, embedded systems, and networking." />
           <div className="skills-grid">{skillGroups.map((group) => { const Icon = group.icon; return <div className="skill-card" key={group.label}><div className="skill-icon"><Icon size={19} /></div><h3>{group.label}</h3><div className="skill-tags">{group.skills.map((skill) => <span key={skill}>{skill}</span>)}</div></div> })}</div>
         </section>
 
         <section className="section-pad work-section" id="work">
-          <div className="work-heading-row"><SectionHeading eyebrow="04 / projects" title="Selected engineering projects." copy="Coursework, lab work, and competition projects." /><span className="work-count">09<br /><small>projects</small></span></div>
+          <div className="work-heading-row"><SectionHeading eyebrow="04 / projects" title="Selected projects." copy="Coursework, lab work, and competition builds." /><span className="work-count">09<br /><small>projects</small></span></div>
           <div className="projects-list">{projects.map((project) => { const Icon = project.icon; return <article className="project-row" key={project.number}><div className="project-index">{project.number}</div><div className="project-icon"><Icon size={20} /></div><div className="project-body"><div className="project-meta"><span>{project.category}</span><span className="project-tech">{project.tech}</span></div><h3>{project.title}</h3><p>{project.description}</p></div><ArrowUpRight className="project-arrow" size={19} /></article> })}</div>
         </section>
 
         <section className="section-pad experience-section" id="experience">
           <div className="section-grid experience-grid">
-            <SectionHeading eyebrow="05 / experience" title="Electrical engineering internship." copy="Practical exposure to power generation and electrical equipment." />
+            <SectionHeading eyebrow="05 / experience" title="Electrical internship." copy="Practical exposure to power generation and electrical equipment." />
             <div className="timeline-wrap"><div className="timeline-line" /><article className="timeline-item"><div className="timeline-node"><BriefcaseBusiness size={16} /></div><div className="timeline-date">July 2025 — October 2025</div><div className="timeline-role"><h3>Electrical Intern</h3><p>Northern Power Generation Company Limited (GENCO-III)</p><span>Thermal Power Station Muzaffargarh</span></div><ul><li>Learned about thermal power generation.</li><li>Observed switchyards, switchgear, and circuit breakers.</li><li>Learned about AC and DC motor testing and maintenance.</li><li>Gained basic exposure to PLC and SCADA systems.</li></ul></article></div>
           </div>
         </section>
 
         <section className="section-pad credentials-section" id="credentials">
-          <div className="credentials-grid"><div><SectionHeading eyebrow="06 / certificates" title="Training and participation." copy="Internship and project participation certificates." /></div><div className="credential-list"><div className="credential-item"><span className="credential-year">SEP 2024</span><div><Award size={18} /><h3>Electrical Department Internship</h3><p>Thermal Power Station, Muzaffargarh</p></div></div><div className="credential-item"><span className="credential-year">JAN 2024</span><div><Award size={18} /><h3>Sumo War Robot Participation</h3><p>Namal Tech Expo 2024</p></div></div></div></div>
+          <div className="credentials-grid"><div><SectionHeading eyebrow="06 / certificates" title="Certificates." copy="Internship and project participation." /></div><div className="credential-list"><div className="credential-item"><span className="credential-year">SEP 2024</span><div><Award size={18} /><h3>Electrical Department Internship</h3><p>Thermal Power Station, Muzaffargarh</p></div></div><div className="credential-item"><span className="credential-year">JAN 2024</span><div><Award size={18} /><h3>Sumo War Robot Participation</h3><p>Namal Tech Expo 2024</p></div></div></div></div>
         </section>
 
         <section className="section-pad contact-section" id="contact">
@@ -263,7 +282,7 @@ function App() {
         </section>
       </main>
 
-      <footer className="site-footer"><div className="brand"><span className="brand-mark">MN<span>/</span></span><span className="brand-copy"><strong>Muhammad Noman</strong><small>electrical engineering</small></span></div><p>Electrical Engineer &amp; Embedded Systems</p><a href="#top" aria-label="Back to top"><ArrowUpRight size={17} /></a></footer>
+      <footer className="site-footer"><a className="brand" href="#top" aria-label="Back to top"><span className="header-profile"><img src={profileImage} alt="Muhammad Noman" /></span><span className="brand-copy"><strong>Muhammad Noman</strong><small>Electrical Engineer</small></span></a><p>Embedded Systems · MATLAB · Robotics</p><a className="back-to-top" href="#top" aria-label="Back to top"><ArrowUpRight size={18} /></a></footer>
     </div>
   )
 }
